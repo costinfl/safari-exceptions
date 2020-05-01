@@ -44,12 +44,13 @@ public class HandleExceptions {
         .forEach(s -> System.out.println(s));
 
     System.out.println("-----------------------------------");
+    Function<Throwable, Stream<String>> recovery =
+        l -> Either.wrap(n -> Files.lines(Paths.get("F.txt"))).apply(l).getSuccess();
     Stream.of("A.txt", "B.txt", "C.txt")
         .map(Either.wrap(n -> Files.lines(Paths.get(n))))
         .peek(e -> e.ifFailure(f -> System.out.println("Didn't work: " + f)))
-//        .filter(e -> e.isSuccess())
-//        .map(e ->
-//            e.recover(l -> Either.wrap(n -> Files.lines(Paths.get("F.txt")))))
+        .map(e -> e.recover(Either.wrap(n -> Files.lines(Paths.get("F.txt")))))
+        .filter(e -> e.isSuccess()) //filter after recovery attempt
         .flatMap(opt -> opt.getSuccess())
         .forEach(s -> System.out.println(s));
   }

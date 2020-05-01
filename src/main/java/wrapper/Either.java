@@ -36,11 +36,15 @@ public class Either<L, R> {
     } else return Either.failure(left);
   }
 
-  public Either<L, R> recover(Function<L, R> recovery) {
+  // Corrected: the function that attempts recovery, might
+  // perhaps obviously!, fail too. So, the return type of
+  // that function should be another Either...
+  public Either<L, R> recover(Function<L, Either<L, R>> recovery) {
     if (left != null) {
-      return Either.success(recovery.apply(left));
+      return recovery.apply(left);
     } else return this;
   }
+
   public boolean isSuccess() {
     return right != null;
   }
